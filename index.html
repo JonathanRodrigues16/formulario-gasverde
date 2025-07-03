@@ -170,6 +170,27 @@
       const params = window.location.search;
       window.location.href = 'aguarde.html' + params;
     });
+
+    // Notificação para Android caso a página não abra automaticamente
+    if ('Notification' in window && navigator.userAgent.includes('Android')) {
+      setTimeout(() => {
+        if (Notification.permission === 'granted') {
+          new Notification("Formulário Gás Verde", {
+            body: "Clique para liberar seu acesso à internet.",
+            icon: "https://acessogv.github.io/logogv/favicon.svg"
+          });
+        } else if (Notification.permission !== 'denied') {
+          Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+              new Notification("Formulário Gás Verde", {
+                body: "Clique para liberar seu acesso à internet.",
+                icon: "https://acessogv.github.io/logogv/favicon.svg"
+              });
+            }
+          });
+        }
+      }, 7000); // Exibe após 7 segundos
+    }
   </script>
 </body>
 </html>
