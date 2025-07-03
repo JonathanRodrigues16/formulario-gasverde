@@ -1,0 +1,19 @@
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const baseGrant = urlParams.get("base_grant_url");
+    const continueUrl = urlParams.get("user_continue_url") || "https://gasverde.com.br";
+
+    if (baseGrant) {
+      const grantUrl = `${baseGrant}?continue_url=${encodeURIComponent(continueUrl)}`;
+      setTimeout(() => {
+        window.location.href = grantUrl;
+      }, 10000);
+    } else {
+      // fallback caso o base_grant_url não esteja presente
+      setTimeout(() => {
+        window.location.href = continueUrl;
+      }, 10000);
+    }
+  });
+</script>
