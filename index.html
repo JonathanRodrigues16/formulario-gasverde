@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -138,7 +140,17 @@
   </div>
 
   <script>
+    // Garantir fallback caso o Android não abra automaticamente
     window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      if (!params.has('base_grant_url')) {
+        // Redireciona para o link direto se acessado fora do fluxo Meraki
+        const fallback = "https://acessogv.github.io/formulario-gasverde/";
+        if (window.location.href !== fallback) {
+          window.location.href = fallback;
+        }
+      }
+
       ['nome', 'email', 'telefone', 'motivo'].forEach(field => {
         const value = localStorage.getItem(field);
         if (value) {
