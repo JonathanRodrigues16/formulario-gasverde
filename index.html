@@ -1,196 +1,115 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Acesso de Visitantes</title>
-  <link rel="icon" type="image/svg+xml" href="https://acessogv.github.io/logogv/favicon.svg" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body, html {
-      height: 100%;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f7f9fa;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-    .container {
-      background: #fff;
-      max-width: 480px;
-      width: 100%;
-      padding: 40px 35px;
-      border-radius: 14px;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.12);
-      color: #1a1a1a;
-      text-align: center;
-    }
-    .logo {
-      max-width: 180px;
-      margin: 0 auto 35px;
-      display: block;
-    }
-    p.subtitle {
-      color: #4d7a53;
-      margin-bottom: 25px;
-      font-size: 1.2rem;
-      font-weight: 600;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 22px;
-      text-align: left;
-    }
-    .input-group {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-    .input-group i {
-      position: absolute;
-      left: 14px;
-      color: #007a33;
-      font-size: 1.2rem;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 14px 14px 14px 42px;
-      border: 1.8px solid #b4c7b5;
-      border-radius: 10px;
-      font-size: 1rem;
-      color: #1a1a1a;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      resize: none;
-    }
-    input:focus, textarea:focus {
-      outline: none;
-      border-color: #007a33;
-      box-shadow: 0 0 6px rgba(0, 122, 51, 0.4);
-    }
-    textarea {
-      min-height: 90px;
-    }
-    button {
-      background-color: #007a33;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 16px;
-      font-size: 1.15rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      box-shadow: 0 6px 12px rgba(0, 122, 51, 0.5);
-      letter-spacing: 0.05em;
-    }
-    button:hover {
-      background-color: #005d26;
-      box-shadow: 0 8px 18px rgba(0, 93, 38, 0.65);
-    }
-    footer {
-      margin-top: 30px;
-      font-size: 0.85rem;
-      color: #6b6b6b;
-      font-weight: 500;
-      letter-spacing: 0.02em;
-    }
-    @media (max-width: 520px) {
-      .container {
-        padding: 30px 25px;
+<script>
+  // Recupera dados do formulário salvos no localStorage
+  window.addEventListener('DOMContentLoaded', () => {
+    ['nome', 'email', 'telefone', 'motivo'].forEach(field => {
+      const value = localStorage.getItem(field);
+      if (value) {
+        document.getElementById(field).value = value;
       }
-      p.subtitle {
-        font-size: 1.1rem;
-        margin-bottom: 20px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="container" role="main" aria-label="Formulário de acesso de visitantes">
-    <img src="https://acessogv.github.io/logogv/images.png" alt="Logo Gás Verde" class="logo" />
-    <p class="subtitle">Preencha o formulário para liberar o acesso à internet.</p>
-    <form id="visitForm" novalidate>
-      <div class="input-group">
-        <i class="fas fa-user"></i>
-        <input type="text" name="nome" id="nome" placeholder="Nome completo" required aria-required="true" />
-      </div>
-      <div class="input-group">
-        <i class="fas fa-envelope"></i>
-        <input type="email" name="email" id="email" placeholder="E-mail" required aria-required="true" />
-      </div>
-      <div class="input-group">
-        <i class="fas fa-phone"></i>
-        <input type="tel" name="telefone" id="telefone" placeholder="Telefone" required aria-required="true" />
-      </div>
-      <div class="input-group">
-        <i class="fas fa-comment"></i>
-        <textarea name="motivo" id="motivo" placeholder="Motivo da visita" required aria-required="true"></textarea>
-      </div>
-      <button type="submit">Enviar e Acessar</button>
-    </form>
-    <footer>© 2025 Gás Verde • Todos os direitos reservados</footer>
-  </div>
+    });
 
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      ['nome', 'email', 'telefone', 'motivo'].forEach(field => {
-        const value = localStorage.getItem(field);
-        if (value) {
-          document.getElementById(field).value = value;
-        }
+    // Redirecionamento para formulário se necessário (Android + acesso não liberado)
+    redirecionarSeNecessario();
+  });
+
+  // Função para verificar se o acesso já foi liberado
+  function acessoLiberado() {
+    return localStorage.getItem('acessoLiberado') === 'true';
+  }
+
+  // Marca o acesso como liberado
+  function liberarAcesso() {
+    localStorage.setItem('acessoLiberado', 'true');
+  }
+
+  // URLs permitidas no walled garden (adicione as que usa)
+  const walledGarden = [
+    'https://acessogv.github.io',
+    'https://connectivitycheck.gstatic.com',
+    'https://msftconnecttest.com',
+    'https://gstatic.com',
+    'https://github.io',
+    'https://raw.githubusercontent.com'
+  ];
+
+  // Função que redireciona para o formulário se o usuário estiver no Android e não liberou acesso
+  function redirecionarSeNecessario() {
+    if (!navigator.userAgent.includes('Android')) return;
+    if (acessoLiberado()) return;
+
+    const urlAtual = window.location.href;
+
+    // Verifica se a urlAtual começa com algum domínio liberado (walled garden)
+    const permitido = walledGarden.some(domain => urlAtual.startsWith(domain));
+    if (!permitido) {
+      // Redireciona para o formulário externo
+      window.location.href = 'https://acessogv.github.io/formulario-gasverde/' + window.location.search;
+    }
+  }
+
+  // Tratamento do envio do formulário
+  document.getElementById('visitForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const nome = document.getElementById('nome').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const telefone = document.getElementById('telefone').value.trim();
+    const motivo = document.getElementById('motivo').value.trim();
+
+    if (!nome || !email || !telefone || !motivo) {
+      alert('Por favor, preencha todos os campos antes de enviar.');
+      return;
+    }
+
+    localStorage.setItem('nome', nome);
+    localStorage.setItem('email', email);
+    localStorage.setItem('telefone', telefone);
+    localStorage.setItem('motivo', motivo);
+
+    liberarAcesso();
+
+    const params = window.location.search;
+    window.location.href = 'aguarde.html' + params;
+  });
+
+  // Função para mostrar notificação web
+  function showNotification() {
+    if (!('Notification' in window)) return;
+    if (Notification.permission === 'granted') {
+      new Notification("Formulário Gás Verde", {
+        body: "Clique para liberar seu acesso à internet.",
+        icon: "https://acessogv.github.io/logogv/favicon.svg"
       });
-    });
-
-    document.getElementById('visitForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-
-      const nome = document.getElementById('nome').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const telefone = document.getElementById('telefone').value.trim();
-      const motivo = document.getElementById('motivo').value.trim();
-
-      if (!nome || !email || !telefone || !motivo) {
-        alert('Por favor, preencha todos os campos antes de enviar.');
-        return;
-      }
-
-      localStorage.setItem('nome', nome);
-      localStorage.setItem('email', email);
-      localStorage.setItem('telefone', telefone);
-      localStorage.setItem('motivo', motivo);
-
-      const params = window.location.search;
-      window.location.href = 'aguarde.html' + params;
-    });
-
-    // Notificação para Android caso a página não abra automaticamente
-    if ('Notification' in window && navigator.userAgent.includes('Android')) {
-      setTimeout(() => {
-        if (Notification.permission === 'granted') {
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
           new Notification("Formulário Gás Verde", {
             body: "Clique para liberar seu acesso à internet.",
             icon: "https://acessogv.github.io/logogv/favicon.svg"
           });
-        } else if (Notification.permission !== 'denied') {
-          Notification.requestPermission().then(permission => {
-            if (permission === 'granted') {
-              new Notification("Formulário Gás Verde", {
-                body: "Clique para liberar seu acesso à internet.",
-                icon: "https://acessogv.github.io/logogv/favicon.svg"
-              });
-            }
-          });
         }
-      }, 7000); // Exibe após 7 segundos
+      });
     }
-  </script>
-</body>
-</html>
+  }
+
+  // Tenta forçar reload da página no Android para abrir no foreground,
+  // depois exibe notificação se usuário não interagir
+  if (navigator.userAgent.includes('Android')) {
+    // Tenta reload após 3s para “despertar” o navegador
+    setTimeout(() => {
+      if (document.visibilityState === 'hidden' || document.visibilityState === 'prerender') {
+        window.location.reload();
+      } else {
+        // Se já está visível, não precisa reload, mas pode mostrar notificação depois de 7s
+        setTimeout(showNotification, 7000);
+      }
+    }, 3000);
+
+    // Se o usuário mudar o foco da aba, para de tentar reload/notificar
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        // Aqui poderia limpar timers, se quiser
+      }
+    });
+  }
+</script>
